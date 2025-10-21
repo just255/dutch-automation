@@ -24,9 +24,9 @@ on:
           - e2e
           - regression
 
-  # Scheduled runs (optional - runs daily at 2 AM UTC)
-  # schedule:
-  #   - cron: '0 2 * * *'
+  # Scheduled runs (weekdays only - Monday through Friday at 2 AM UTC)
+  schedule:
+    - cron: '0 2 * * 1-5'
 
 jobs:
   test:

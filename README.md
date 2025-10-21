@@ -260,7 +260,7 @@ ENABLE_SCREENSHOTS=false pytest tests/
 
 ### Overview
 
-The framework includes a comprehensive GitHub Actions workflow that automatically runs tests on every push, pull request, and can be triggered manually. **GitHub Actions is completely free for public repositories** with unlimited CI/CD minutes.
+The framework includes a comprehensive GitHub Actions workflow that automatically runs tests on every push, pull request, scheduled weekday runs, and can be triggered manually. **GitHub Actions is completely free for public repositories** with unlimited CI/CD minutes.
 
 ### Workflow Triggers
 
@@ -272,9 +272,9 @@ The framework includes a comprehensive GitHub Actions workflow that automaticall
 - ✅ Run specific test suites on demand (smoke, critical, e2e, regression, all)
 - ✅ Accessible via GitHub Actions UI: **Actions → E2E Test Automation → Run workflow**
 
-**Scheduled (Optional):**
-- ⏰ Daily runs at 2 AM UTC (commented out by default)
-- Uncomment the `schedule` section in `.github/workflows/test-automation.yml` to enable
+**Scheduled:**
+- ⏰ Automated runs Monday-Friday at 2 AM UTC (weekdays only)
+- Skips weekends to conserve CI/CD minutes
 
 ### Test Suite Selection
 
