@@ -1,0 +1,35 @@
+{
+  "test_users": [
+    {
+      "email": "test_dutch_auto_2025@yopmail.com",
+      "password": "TestPass123!@#",
+      "first_name": "Test",
+      "last_name": "User"
+    }
+  ],
+  "pet_info": {
+    "pet_name": "BUDDY",
+    "pet_type": "dog",
+    "state": "CA"
+  },
+  "issues": [
+    "Allergy",
+    "Skin",
+    "Preventive care"
+  ],
+  "contact_info": {
+    "phone": "5551234567"
+  },
+  "payment_info": {
+    "card_number": "4242424242424242",
+    "cvv": "123",
+    "expiry_month": "12",
+    "expiry_year": "2025",
+    "billing_zip": "90210"
+  },
+  "test_notes": {
+    "DO_NOT_SUBMIT_ORDER": true,
+    "STOP_AT_CHECKOUT": "Fill all fields but do not click Subscribe button",
+    "TEST_ENVIRONMENT": "Production website - be careful"
+  }
+}
