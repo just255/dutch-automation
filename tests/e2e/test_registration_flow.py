@@ -26,6 +26,7 @@ logger = setup_logger(__name__)
 class TestRegistrationFlow:
     """Test class for complete registration to checkout flow."""
 
+    @pytest.mark.smoke
     @pytest.mark.e2e
     @pytest.mark.critical
     @pytest.mark.payment

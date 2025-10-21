@@ -273,7 +273,8 @@ The framework includes a comprehensive GitHub Actions workflow that automaticall
 - ✅ Accessible via GitHub Actions UI: **Actions → E2E Test Automation → Run workflow**
 
 **Scheduled:**
-- ⏰ Automated runs Monday-Friday at 2 AM UTC (weekdays only)
+- ⏰ Automated smoke tests Monday-Friday at 2 AM UTC (weekdays only)
+- Runs quick smoke tests for continuous validation
 - Skips weekends to conserve CI/CD minutes
 
 ### Test Suite Selection
@@ -292,11 +293,13 @@ When manually triggering the workflow, you can choose which tests to run:
 
 **Environment:**
 - 🐍 Python 3.9
-- 🌐 Chrome (headless mode)
+- 🌐 **Multi-browser testing:** Chrome, Firefox, Edge (all headless)
+- 🔄 Matrix strategy runs tests on all 3 browsers in parallel
 - 🐧 Ubuntu latest
 - ⚡ Pip caching for faster runs
+- 🚀 WebDriver Manager auto-downloads browser drivers
 
-**Artifacts:**
+**Artifacts** (separate for each browser):
 - 📊 HTML test reports (30-day retention)
 - 📸 Screenshots on failure (30-day retention)
 - 📝 Test execution logs
@@ -312,8 +315,12 @@ When manually triggering the workflow, you can choose which tests to run:
 **2. Download test reports:**
    - Click on any workflow run
    - Scroll to "Artifacts" section
-   - Download `test-reports-python-3.9.zip`
-   - Open `reports/report.html` in browser
+   - Download browser-specific reports:
+     - `test-reports-chrome-python-3.9.zip`
+     - `test-reports-firefox-python-3.9.zip`
+     - `test-reports-edge-python-3.9.zip`
+   - Extract and open `reports/report.html` in browser
+   - Each browser has separate reports and screenshots
 
 **3. View test summary:**
    - Click on any workflow run

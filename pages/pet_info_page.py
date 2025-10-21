@@ -23,17 +23,18 @@ class PetInfoPage(BasePage):
     pet_info_page_cat_radio_button = (By.ID, "cat")
 
     # Input Fields
-    pet_info_page_pet_name_input = (By.ID, "pet-name")
+    # NOTE: Dutch.com A/B testing serves different IDs: "pet-name" OR "petName"
+    # Using XPath to match either variation
+    pet_info_page_pet_name_input = (By.XPATH, "//input[@id='pet-name' or @id='petName']")
     pet_info_page_state_dropdown = (By.ID, "state")
 
     # Buttons
+    # NOTE: Form and button lack unique IDs (preferred for stable locators)
+    # Using text-based locator as website structure changed
     pet_info_page_continue_button = (
         By.XPATH,
-        "//form[@id='reg-flow-register']//button[@type='submit']"
+        "//button[@type='submit' and contains(text(), 'Continue')]"
     )
-
-    # Form Container
-    pet_info_page_form_container = (By.ID, "reg-flow-register")
 
     def select_dog(self) -> None:
         """Select dog as pet type."""
