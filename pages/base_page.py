@@ -15,7 +15,8 @@ from selenium.webdriver.common.keys import Keys
 from selenium.common.exceptions import (
     TimeoutException,
     NoSuchElementException,
-    ElementNotInteractableException
+    ElementNotInteractableException,
+    ElementClickInterceptedException
 )
 from typing import Tuple, Optional
 import time
@@ -73,7 +74,8 @@ class BasePage:
 
     def click_element(self, locator: Tuple, timeout: int = 10) -> None:
         """
-        Click an element with explicit wait.
+        Click an element with explicit wait and scroll into view.
+        Retries with JavaScript click if regular click is intercepted.
 
         Args:
             locator: Tuple of (By.TYPE, "value")
@@ -86,7 +88,18 @@ class BasePage:
             element = WebDriverWait(self.driver, timeout).until(
                 EC.element_to_be_clickable(locator)
             )
-            element.click()
+            # Scroll element into view to avoid interception
+            self.driver.execute_script("arguments[0].scrollIntoView({block: 'center'});", element)
+
+            try:
+                element.click()
+            except ElementClickInterceptedException:
+                # If click is intercepted, wait for element to be stable and retry with JS click
+                WebDriverWait(self.driver, 3).until(
+                    EC.element_to_be_clickable(locator)
+                )
+                self.driver.execute_script("arguments[0].click();", element)
+
             # Auto-screenshot after click
             element_name = str(locator[1])[:30] if len(locator) > 1 else "element"
             self._auto_screenshot("click", element_name)

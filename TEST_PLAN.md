@@ -230,6 +230,7 @@ pytest tests/e2e/test_registration_flow.py::TestRegistrationFlow::test_complete_
 **Current Test Markers:**
 
 The complete registration flow test is marked as:
+- `@pytest.mark.smoke` (smoke test - quick validation)
 - `@pytest.mark.e2e` (end-to-end)
 - `@pytest.mark.critical` (critical path)
 - `@pytest.mark.payment` (payment flow)

@@ -30,12 +30,17 @@ on:
 
 jobs:
   test:
-    name: Run E2E Tests
+    name: Run E2E Tests (${{ matrix.browser }})
     runs-on: ubuntu-latest
 
     strategy:
       matrix:
         python-version: ['3.9']
+        # Edge temporarily disabled due to infrastructure issue:
+        # Microsoft CDN (msedgedriver.azureedge.net) DNS resolution failing in GitHub Actions
+        # Error: "Failed to resolve 'msedgedriver.azureedge.net'"
+        # Re-enable when Microsoft's CDN is stable
+        browser: ['chrome', 'firefox'] # 'edge'
       fail-fast: false
 
     steps:
@@ -49,9 +54,23 @@ jobs:
           cache: 'pip'
 
       - name: Install Chrome
+        if: matrix.browser == 'chrome'
         uses: browser-actions/setup-chrome@v1
         with:
           chrome-version: stable
+
+      - name: Install Firefox
+        if: matrix.browser == 'firefox'
+        uses: browser-actions/setup-firefox@v1
+        with:
+          firefox-version: latest
+
+      # Edge installation disabled - see browser matrix comment above
+      # - name: Install Edge
+      #   if: matrix.browser == 'edge'
+      #   uses: browser-actions/setup-edge@v1
+      #   with:
+      #     edge-version: stable
 
       - name: Install dependencies
         run: |
@@ -59,11 +78,11 @@ jobs:
           pip install -r requirements.txt
 
       - name: Run smoke tests
-        if: github.event_name == 'pull_request' || github.event.inputs.test_suite == 'smoke'
+        if: github.event_name == 'pull_request' || github.event.inputs.test_suite == 'smoke' || github.event_name == 'schedule'
         run: |
           pytest -m smoke -v --html=reports/smoke_report.html --self-contained-html
         env:
-          BROWSER: chrome
+          BROWSER: ${{ matrix.browser }}
           HEADLESS: true
 
       - name: Run critical tests
@@ -71,7 +90,7 @@ jobs:
         run: |
           pytest -m critical -v --html=reports/critical_report.html --self-contained-html
         env:
-          BROWSER: chrome
+          BROWSER: ${{ matrix.browser }}
           HEADLESS: true
 
       - name: Run E2E tests
@@ -79,7 +98,7 @@ jobs:
         run: |
           pytest -m e2e -v --html=reports/e2e_report.html --self-contained-html
         env:
-          BROWSER: chrome
+          BROWSER: ${{ matrix.browser }}
           HEADLESS: true
 
       - name: Run regression suite
@@ -87,22 +106,22 @@ jobs:
         run: |
           pytest -m regression -v --html=reports/regression_report.html --self-contained-html
         env:
-          BROWSER: chrome
+          BROWSER: ${{ matrix.browser }}
           HEADLESS: true
 
       - name: Run all tests
-        if: github.event_name == 'push' || github.event.inputs.test_suite == 'all' || github.event_name == 'schedule'
+        if: github.event_name == 'push' || github.event.inputs.test_suite == 'all'
         run: |
           pytest tests/ -v --html=reports/full_report.html --self-contained-html
         env:
-          BROWSER: chrome
+          BROWSER: ${{ matrix.browser }}
           HEADLESS: true
 
       - name: Upload test reports
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: test-reports-python-${{ matrix.python-version }}
+          name: test-reports-${{ matrix.browser }}-python-${{ matrix.python-version }}
           path: |
             reports/
             logs/
@@ -112,7 +131,7 @@ jobs:
         if: failure()
         uses: actions/upload-artifact@v4
         with:
-          name: failure-screenshots-python-${{ matrix.python-version }}
+          name: failure-screenshots-${{ matrix.browser }}-python-${{ matrix.python-version }}
           path: reports/**/screenshots/
           retention-days: 30
 
@@ -122,7 +141,7 @@ jobs:
           echo "## Test Execution Summary" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
           echo "- **Python Version:** ${{ matrix.python-version }}" >> $GITHUB_STEP_SUMMARY
-          echo "- **Browser:** Chrome (Headless)" >> $GITHUB_STEP_SUMMARY
+          echo "- **Browser:** ${{ matrix.browser }} (Headless)" >> $GITHUB_STEP_SUMMARY
           echo "- **Test Suite:** ${{ github.event.inputs.test_suite || 'all' }}" >> $GITHUB_STEP_SUMMARY
           echo "- **Trigger:** ${{ github.event_name }}" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY

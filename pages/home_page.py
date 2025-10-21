@@ -23,7 +23,11 @@ class HomePage(BasePage):
     home_page_nav_signup_link = (By.CSS_SELECTOR, "#header a[href='/account/register'].button")
 
     # Call-to-Action Elements (Registration Flow)
-    home_page_primary_cta_button = (By.CSS_SELECTOR, "a[href='/account/register'].rounded-full.bg-black")
+    # Note: Website uses different URLs (A/B testing or geo-based):
+    # - Some regions: href="/account/register"
+    # - Other regions: href="https://register.dutch.com/"
+    # Targeting the header Join Now button with specific classes to avoid hidden elements
+    home_page_primary_cta_button = (By.XPATH, "//a[contains(@class, 'button') and contains(@class, 'px-4') and contains(text(), 'Join Now')]")
     home_page_get_started_button = (
         By.XPATH,
         "//a[@href='/account/register' and contains(@class, 'rounded-full') and contains(., 'Get started')]"
