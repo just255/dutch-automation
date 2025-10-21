@@ -181,6 +181,61 @@ Test Cases (business scenarios)
 - Organized by test run timestamp
 - Failure screenshots saved to dedicated folder
 
+### Test Suite Organization
+
+**Folder Structure:**
+
+Tests are organized by test type and purpose:
+
+```
+tests/
+├── e2e/                    # End-to-end tests (full user journeys)
+│   └── test_registration_flow.py
+├── component/              # Component-level tests (reusable UI components)
+├── page/                   # Page-level tests (individual page functionality)
+└── smoke/                  # Quick smoke tests (critical functionality validation)
+```
+
+**Pytest Markers:**
+
+All tests are tagged with appropriate markers for flexible test execution:
+
+- `@pytest.mark.e2e` - End-to-end tests
+- `@pytest.mark.critical` - Critical path tests that must pass
+- `@pytest.mark.payment` - Payment-related tests
+- `@pytest.mark.registration` - Registration flow tests
+- `@pytest.mark.smoke` - Quick smoke tests
+- `@pytest.mark.regression` - Full regression suite
+- `@pytest.mark.validation` - Input validation tests
+- `@pytest.mark.component` - Component-level tests
+- `@pytest.mark.page` - Page-level tests
+- `@pytest.mark.slow` - Long-running tests
+
+**Test Execution Options:**
+
+```bash
+# Run by folder
+pytest tests/e2e/ -v                    # All E2E tests
+pytest tests/smoke/ -v                  # Quick smoke tests only
+
+# Run by marker
+pytest -m critical                      # Critical tests only
+pytest -m "e2e and payment"             # E2E payment tests
+pytest -m "smoke or critical"           # Smoke OR critical tests
+
+# Run specific test
+pytest tests/e2e/test_registration_flow.py::TestRegistrationFlow::test_complete_registration_to_checkout -v
+```
+
+**Current Test Markers:**
+
+The complete registration flow test is marked as:
+- `@pytest.mark.e2e` (end-to-end)
+- `@pytest.mark.critical` (critical path)
+- `@pytest.mark.payment` (payment flow)
+- `@pytest.mark.registration` (registration flow)
+- `@pytest.mark.regression` (class level - full suite)
+
 ---
 
 ## Test Scenarios

@@ -1,12 +1,14 @@
 # Dutch.com Test Automation Framework
 
+[![E2E Test Automation](https://github.com/just255/dutch-automation/actions/workflows/test-automation.yml/badge.svg)](https://github.com/just255/dutch-automation/actions/workflows/test-automation.yml)
+
 A production-ready Selenium + Python test automation framework demonstrating enterprise-level best practices for E2E testing.
 
 ## Overview
 
 Automated end-to-end test suite for Dutch.com registration flow (home page → checkout) using Page Object Model with component composition, type-safe data handling, and comprehensive reporting.
 
-**Tech Stack:** Python 3.9+ • Selenium 4 • Pytest • WebDriver Manager
+**Tech Stack:** Python 3.9+ • Selenium 4 • Pytest • WebDriver Manager • GitHub Actions CI/CD
 
 ---
 
@@ -22,6 +24,7 @@ Automated end-to-end test suite for Dutch.com registration flow (home page → c
 - [Test Execution Flow](#test-execution-flow)
 - [Configuration](#configuration)
 - [Running Tests](#running-tests)
+- [CI/CD with GitHub Actions](#cicd-with-github-actions)
 - [Architecture Highlights](#architecture-highlights)
 - [Naming Conventions](#naming-conventions)
 - [Important Notes](#important-notes)
@@ -43,12 +46,12 @@ source venv/bin/activate       # macOS/Linux
 pip install -r requirements.txt
 
 # 3. Run
-pytest tests/test_registration_flow.py -v
+pytest tests/e2e/test_registration_flow.py -v
 ```
 
 **Expected Output:**
 ```
-tests/test_registration_flow.py::TestRegistrationFlow::test_complete_registration_to_checkout PASSED [100%]
+tests/e2e/test_registration_flow.py::TestRegistrationFlow::test_complete_registration_to_checkout PASSED [100%]
 ============================= 1 passed in 18.67s ==============================
 ```
 
@@ -76,12 +79,22 @@ tests/test_registration_flow.py::TestRegistrationFlow::test_complete_registratio
 - Parallel execution ready
 - Zero hardcoded values
 
+**CI/CD & DevOps:**
+- GitHub Actions workflow (free unlimited runs)
+- Automated test execution on push/PR
+- Manual workflow dispatch with test suite selection
+- Test reports and screenshots as artifacts
+- Pytest marker-based test organization
+
 ---
 
 ## Project Structure
 
 ```
 dutch-automation/
+├── .github/
+│   └── workflows/
+│       └── test-automation.yml   # GitHub Actions CI/CD workflow
 ├── config/
 │   ├── settings.py              # Configuration (URLs, timeouts, paths)
 │   └── test_data.json            # Test data (externalized from code)
@@ -97,14 +110,18 @@ dutch-automation/
 │   ├── checkout_page.py
 │   └── order_summary_page.py
 ├── tests/
-│   └── test_registration_flow.py
+│   ├── e2e/                      # End-to-end tests
+│   │   └── test_registration_flow.py
+│   ├── component/                # Component-level tests
+│   ├── page/                     # Page-level tests
+│   └── smoke/                    # Quick smoke tests
 ├── utils/
 │   ├── driver_manager.py         # Multi-browser WebDriver setup
 │   ├── logger.py                 # Logging configuration
 │   ├── screenshot_helper.py      # Screenshot utilities
 │   └── enums.py                  # Type-safe enums
 ├── conftest.py                   # Pytest fixtures
-└── pytest.ini                    # Pytest configuration
+└── pytest.ini                    # Pytest configuration with markers
 ```
 
 ---
@@ -156,9 +173,64 @@ export HEADLESS=false
 
 ## Running Tests
 
-**Basic execution:**
+### Test Suite Organization
+
+Tests are organized by folder and marked with pytest markers:
+
+```
+tests/
+├── e2e/                    # End-to-end tests (full user journeys)
+│   └── test_registration_flow.py
+├── component/              # Component-level tests
+├── page/                   # Page-level tests
+└── smoke/                  # Quick smoke tests
+```
+
+**Run tests by folder:**
 ```bash
-pytest tests/test_registration_flow.py -v
+# Run all E2E tests
+pytest tests/e2e/ -v
+
+# Run specific test file
+pytest tests/e2e/test_registration_flow.py -v
+```
+
+**Run tests by marker:**
+```bash
+# Critical path tests only
+pytest -m critical
+
+# E2E tests
+pytest -m e2e
+
+# Smoke tests (fast validation)
+pytest -m smoke
+
+# Payment-related tests
+pytest -m payment
+
+# Combine markers
+pytest -m "e2e and critical"    # Both markers required
+pytest -m "smoke or critical"   # Either marker
+```
+
+**Available markers:**
+- `e2e` - End-to-end tests (full user journeys)
+- `page` - Page-level tests
+- `component` - Component-level tests
+- `smoke` - Quick smoke tests
+- `critical` - Critical path tests
+- `payment` - Payment-related tests
+- `registration` - Registration flow tests
+- `validation` - Input validation tests
+- `regression` - Full regression suite
+- `slow` - Long-running tests
+
+### Basic Test Execution
+
+**Run all tests:**
+```bash
+pytest tests/ -v
 ```
 
 **Different browser:**
@@ -181,6 +253,100 @@ pytest tests/ --html=reports/report.html --self-contained-html
 ```bash
 ENABLE_SCREENSHOTS=false pytest tests/
 ```
+
+---
+
+## CI/CD with GitHub Actions
+
+### Overview
+
+The framework includes a comprehensive GitHub Actions workflow that automatically runs tests on every push, pull request, and can be triggered manually. **GitHub Actions is completely free for public repositories** with unlimited CI/CD minutes.
+
+### Workflow Triggers
+
+**Automatic:**
+- ✅ Push to `master` or `main` branch → Runs full test suite
+- ✅ Pull requests → Runs smoke tests only (fast validation)
+
+**Manual Dispatch:**
+- ✅ Run specific test suites on demand (smoke, critical, e2e, regression, all)
+- ✅ Accessible via GitHub Actions UI: **Actions → E2E Test Automation → Run workflow**
+
+**Scheduled (Optional):**
+- ⏰ Daily runs at 2 AM UTC (commented out by default)
+- Uncomment the `schedule` section in `.github/workflows/test-automation.yml` to enable
+
+### Test Suite Selection
+
+When manually triggering the workflow, you can choose which tests to run:
+
+| Suite | Description | Use Case |
+|-------|-------------|----------|
+| **smoke** | Quick critical functionality tests | Fast PR validation |
+| **critical** | Critical path tests only | Pre-release verification |
+| **e2e** | End-to-end tests | Full user journey validation |
+| **regression** | Full regression suite | Comprehensive testing |
+| **all** | All tests (default) | Complete test coverage |
+
+### Workflow Features
+
+**Environment:**
+- 🐍 Python 3.9
+- 🌐 Chrome (headless mode)
+- 🐧 Ubuntu latest
+- ⚡ Pip caching for faster runs
+
+**Artifacts:**
+- 📊 HTML test reports (30-day retention)
+- 📸 Screenshots on failure (30-day retention)
+- 📝 Test execution logs
+- 📋 Test summary in GitHub UI
+
+### Viewing Results
+
+**1. Check workflow status:**
+   - Visit: `https://github.com/just255/dutch-automation/actions`
+   - Green checkmark = tests passed
+   - Red X = tests failed
+
+**2. Download test reports:**
+   - Click on any workflow run
+   - Scroll to "Artifacts" section
+   - Download `test-reports-python-3.9.zip`
+   - Open `reports/report.html` in browser
+
+**3. View test summary:**
+   - Click on any workflow run
+   - Summary shows: Python version, browser, test suite, trigger
+
+### Manual Workflow Dispatch
+
+```bash
+# Via GitHub UI:
+1. Go to: https://github.com/just255/dutch-automation/actions
+2. Click "E2E Test Automation" workflow
+3. Click "Run workflow" button
+4. Select test suite from dropdown
+5. Click "Run workflow"
+
+# Via GitHub CLI (if installed):
+gh workflow run test-automation.yml -f test_suite=smoke
+gh workflow run test-automation.yml -f test_suite=critical
+gh workflow run test-automation.yml -f test_suite=all
+```
+
+### CI/CD Best Practices
+
+**For Interviews:**
+This setup demonstrates:
+- ✅ Automated testing in CI/CD pipeline
+- ✅ Multiple test suite strategies (smoke, regression, etc.)
+- ✅ Artifact management and retention
+- ✅ Matrix testing capabilities (easy to expand to multiple Python versions)
+- ✅ Scheduled testing for continuous monitoring
+- ✅ Manual workflow triggers for on-demand testing
+
+**Cost:** $0.00 (unlimited free minutes for public repos)
 
 ---
 

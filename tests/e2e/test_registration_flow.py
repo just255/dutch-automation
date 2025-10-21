@@ -26,6 +26,10 @@ logger = setup_logger(__name__)
 class TestRegistrationFlow:
     """Test class for complete registration to checkout flow."""
 
+    @pytest.mark.e2e
+    @pytest.mark.critical
+    @pytest.mark.payment
+    @pytest.mark.registration
     def test_complete_registration_to_checkout(self, setup, config, test_data, screenshot_helper):
         """
         Test complete flow from home page through to checkout.
